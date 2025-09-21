@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tabla con Formulario</title>
+<link rel="stylesheet" href="ejercicio4.css">
+</head>
+<body>
+<header><h1>Tabla con Formulario</h1></header>
+<main>
+<div class="controls">
+<button class="btn" id="load2">Cargar</button>
+<button class="ghost" id="clear2">Vaciar</button>
+<button class="btn" id="open2">Abrir Formulario</button>
+</div>
+<div class="table-wrap">
+<table id="tabla2">
+<thead>
+<tr>
+<th>NroComprobante</th><th>NroFacturaImputada</th><th>CodigoTipo</th><th>DescripcionTipo</th><th>CodCliente</th><th>RazonSocial</th><th>FechaComprobante</th><th>TotalComprobante</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+<div class="modal-overlay" id="overlay2">
+<div class="modal-box">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<strong>Alta Nota</strong><button id="close2" class="ghost">X</button>
+</div>
+<form id="form2" style="margin-top:12px">
+<div class="row"><div class="col"><label>Nro</label><input id="f_nro"></div><div class="col"><label>Tipo</label><select id="f_tipo"></select></div></div>
+<div class="row"><div class="col"><label>Factura</label><input id="f_fact"></div><div class="col"><label>Cliente</label><input id="f_cli"></div></div>
+<div class="row"><div class="col"><label>Razon</label><input id="f_raz"></div><div class="col"><label>Fecha</label><input id="f_fecha" type="date"></div></div>
+<div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end"><button class="btn" id="f_send" type="submit">Agregar</button><button class="ghost" id="f_cancel" type="button">Cancelar</button></div>
+</form>
+</div>
+</div>
+</main>
+<script>
+(function(){
+const tbody=document.querySelector('#tabla2 tbody');
+let datos=[];
+document.getElementById('load2').addEventListener('click',function(){fetch('notas_debito.json').then(r=>r.json()).then(j=>{datos=j.encabezados_notas_debito||[];render()})});
+document.getElementById('clear2').addEventListener('click',function(){datos=[];render()});
+document.getElementById('open2').addEventListener('click',function(){fetch('notas_debito.json').then(r=>r.json()).then(j=>{const sel=document.getElementById('f_tipo');sel.innerHTML='';(j.tipos_comprobante_disponibles||[]).forEach(t=>{const o=document.createElement('option');o.value=t.codigo_tipo;o.textContent=t.codigo_tipo+' - '+t.descripcion_tipo;sel.appendChild(o)});document.getElementById('overlay2').style.display='flex'})});
+document.getElementById('close2').addEventListener('click',function(){document.getElementById('overlay2').style.display='none'});
+document.getElementById('f_cancel').addEventListener('click',function(){document.getElementById('overlay2').style.display='none'});
+document.getElementById('form2').addEventListener('submit',function(e){e.preventDefault();const n={nro_comprobante:document.getElementById('f_nro').value,nro_de_factura_imputada:document.getElementById('f_fact').value,tipo_comprobante:{codigo_tipo:document.getElementById('f_tipo').value,descripcion_tipo:document.getElementById('f_tipo').selectedOptions[0]?.text.split(' - ')[1]},cod_cliente:document.getElementById('f_cli').value,razon_social:document.getElementById('f_raz').value,fecha_comprobante:document.getElementById('f_fecha').value,total_comprobante:0};datos.push(n);render();document.getElementById('overlay2').style.display='none';document.getElementById('form2').reset()});
+function render(){tbody.innerHTML='';datos.forEach(n=>{const tr=document.createElement('tr');tr.innerHTML='<td>'+ (n.nro_comprobante||'') +'</td><td>'+ (n.nro_de_factura_imputada||'') +'</td><td>'+ (n.tipo_comprobante?.codigo_tipo||'') +'</td><td>'+ (n.tipo_comprobante?.descripcion_tipo||'') +'</td><td>'+ (n.cod_cliente||'') +'</td><td>'+ (n.razon_social||'') +'</td><td>'+ (n.fecha_comprobante||'') +'</td><td>'+ (n.total_comprobante||'') +'</td>';tbody.appendChild(tr)})}
+})();
+</script>
+</body>
+</html>

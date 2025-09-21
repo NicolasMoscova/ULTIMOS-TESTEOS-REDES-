@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Artículos - Interfaz profesor (modificada)</title>
+    <link rel="stylesheet" href="Redes-prueba-main/ejercicio1.css">
+    <link rel="stylesheet" href="Redes-prueba-main/ejercicio2.css">
+    <link rel="stylesheet" href="Redes-prueba-main/ejercicio3.css">
+
+<style>
+/* Minimal styles inspired by the professor's video */
+body { font-family: Arial, sans-serif; margin:0; background: linear-gradient(#cfcfcf, #6f6f6f); }
+.header { background:#e9e6d0; padding:18px; text-align:center; font-weight:bold; }
+.container { max-width:1100px; margin:30px auto; }
+.table-header { background:#c84b4b; color:#200; padding:12px 0; display:flex; justify-content:space-between; align-items:center; }
+.table-header .col { flex:1; text-align:center; font-size:12px; font-weight:600; text-transform:uppercase; }
+.actions { float:right; padding:10px; }
+
+/* Modal overlay */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; }
+.modal { width:80%; max-width:1000px; background:#efe9d0; border:1px solid #bfb4a0; box-shadow:0 0 0 6px rgba(0,0,0,0.08); }
+.modal .modal-header { background:#c9c0c0; padding:12px 18px; font-weight:bold; }
+.modal .modal-body { padding:20px; display:flex; gap:30px; }
+.form-col { flex:1; }
+.input-box { width:100%; padding:14px; border:1px solid #9a9a9a; background:#e7e7e7; margin-bottom:18px; }
+
+/* Footer */
+.footer { text-align:center; padding:16px; margin-top:20px; background:rgba(0,0,0,0.05); }
+
+/* Simple responsive */
+@media (max-width:800px){ .modal .modal-body { flex-direction:column; } .table-header .col { font-size:11px; } }
+</style>
+</head>
+<body>
+<div class="header">Artículos</div>
+<div class="container">
+  <div style="display:flex; justify-content:flex-end; gap:12px; margin:10px 0;">
+    <button onclick="cargarDatos()">Cargar datos</button>
+    <button onclick="vaciarDatos()">Vaciar datos</button>
+    <button onclick="abrirModal()">Cargar Form</button>
+  </div>
+
+  <div class="table-header" role="table">
+    <div class="col">CodArt</div>
+    <div class="col">Familia</div>
+    <div class="col">UM</div>
+    <div class="col">Descripción</div>
+    <div class="col">Fecha Alta</div>
+    <div class="col">Saldo Stock</div>
+  </div>
+
+  <div id="table-body" style="background:linear-gradient(#8fb0b8,#6a6a6a); min-height:420px; padding:20px; color:#111;">
+    <!-- datos cargados dinámicamente aquí -->
+  </div>
+
+  <div style="display:flex; justify-content:space-between; margin-top:8px;">
+    <div style="font-size:12px; padding:8px;">sum codArt</div>
+    <div style="font-size:12px; padding:8px;">sum familia</div>
+    <div style="font-size:12px; padding:8px;">sum um</div>
+    <div style="font-size:12px; padding:8px;">sum descripcion</div>
+    <div style="font-size:12px; padding:8px;">sum fecha alta</div>
+    <div style="font-size:12px; padding:8px;">sum saldo Stock</div>
+  </div>
+
+  <div class="footer">Pie</div>
+</div>
+
+<!-- Modal (hidden by default) -->
+<div id="modal" class="modal-overlay" style="display:none;">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">Encabezado modal <button style="float:right;" onclick="cerrarModal()">X</button></div>
+    <div class="modal-body">
+      <div class="form-col">
+        <h3>Formulario para ALTA - Maestro de Artículos</h3>
+        <label>codArt:</label>
+        <input id="codArt" class="input-box">
+        <label>Descripción:</label>
+        <textarea id="descripcion" class="input-box" style="height:80px;"></textarea>
+        <label>Saldo stock:</label>
+        <input id="saldo" class="input-box" value="0">
+      </div>
+      <div class="form-col">
+        <label>Familia de artículo:</label>
+        <select id="familia" class="input-box">
+          <option>Conservas de fruta</option>
+          <option>Enlatados</option>
+          <option>Bebidas</option>
+        </select>
+        <label>Fecha Alta:</label>
+        <input id="fecha" type="date" class="input-box">
+        <div style="height:36px;"></div>
+        <button style="width:70%; padding:10px 16px;" onclick="enviar()">ENVIAR</button>
+      </div>
+    </div>
+    <div style="padding:12px; text-align:center; font-weight:bold;">Pie del formulario</div>
+  </div>
+</div>
+
+<script>
+// Keep user's data structure (as requested) and a demo array to populate the table.
+// Headers for notas de débito de ventas requested by you (Alumno: Moscova)
+const encabezadosNotaDebito = [
+  'NroComprobante',
+  'NrodeFacturaImputada',
+  'TipoComprobante', // parametrizable: {codigoTipo, DescripcionTipo}
+  'CodCliente',
+  'RazonSocial',
+  'fechaComprobante',
+  'TotalComprobante'
+];
+console.log('Alumno: Moscova', encabezadosNotaDebito);
+
+// Minimal data store - we try not to overwrite any existing files; this is added alongside original project.
+let articulos = [];
+
+function cargarDatos(){ 
+  // demo load - you can replace with your original JSON or code; this keeps your files untouched
+  articulos = [
+    {'codArt':'A001','familia':'Conservas de fruta','um':'u','descripcion':'Durazno en almíbar','fechaAlta':'2025-08-01','saldo':12},
+    {'codArt':'A002','familia':'Bebidas','um':'u','descripcion':'Jugo natural','fechaAlta':'2025-07-10','saldo':30}
+  ];
+  renderTable();
+  alert('Datos cargados (demo).');
+}
+
+function vaciarDatos(){ articulos = []; renderTable(); alert('Datos vaciados.'); }
+
+function abrirModal(){ document.getElementById('modal').style.display='flex'; }
+function cerrarModal(){ document.getElementById('modal').style.display='none'; }
+
+function enviar(){
+  const a = { 
+    codArt: document.getElementById('codArt').value || '(sin cod)',
+    familia: document.getElementById('familia').value,
+    um: 'u',
+    descripcion: document.getElementById('descripcion').value || '',
+    fechaAlta: document.getElementById('fecha').value || '',
+    saldo: parseInt(document.getElementById('saldo').value)||0
+  };
+  articulos.push(a);
+  renderTable();
+  cerrarModal();
+  alert('Artículo agregado.');
+}
+
+function renderTable(){
+  const body = document.getElementById('table-body');
+  body.innerHTML = '';
+  if(articulos.length===0){
+    body.innerHTML = '<div style="padding:18px; color:#200;">No hay datos</div>';
+    return;
+  }
+  articulos.forEach(it=>{
+    const row = document.createElement('div');
+    row.style.display='flex';
+    row.style.gap='8px';
+    row.style.padding='8px 6px';
+    row.style.borderBottom='1px solid rgba(0,0,0,0.06)';
+    row.innerHTML = `
+      <div style="flex:1">${it.codArt}</div>
+      <div style="flex:1">${it.familia}</div>
+      <div style="flex:1">${it.um}</div>
+      <div style="flex:2">${it.descripcion}</div>
+      <div style="flex:1">${it.fechaAlta}</div>
+      <div style="flex:1">${it.saldo}</div>
+    `;
+    body.appendChild(row);
+  });
+}
+
+// On load, try to reuse any existing JS from your project by calling functions if present
+window.addEventListener('DOMContentLoaded', ()=>{
+  // if your original project has an init function, try calling it (keeps your code)
+  if(typeof init === 'function'){ try{ init(); }catch(e){ console.warn('init failed',e); } }
+});
+</script>
+
+
+</body>
+</html>

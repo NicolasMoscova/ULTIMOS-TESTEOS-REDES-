@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Especiales - Moscova</title>
+</head>
+<body>
+<h1>Trabajo Especiales - Moscova</h1>
+<ul>
+<li><a href="formulario.html">Formulario con Variables</a></li>
+<li><a href="tabla_variable.html">Tabla con Variables</a></li>
+<li><a href="modal.html">Ventana Modal</a></li>
+<li><a href="tabla_formulario.html">Tabla con Formulario</a></li>
+</ul>
+</body>
+</html>
