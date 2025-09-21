@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ventana Modal</title>
+<link rel="stylesheet" href="ejercicio3.css">
+</head>
+<body>
+<header><h1>Ventana Modal</h1></header>
+<main>
+<div class="controls">
+<button class="btn" id="open">Abrir Formulario</button>
+</div>
+<div class="modal-overlay" id="overlay">
+<div class="modal-box">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<strong>Formulario para ALTA</strong><button id="close" class="ghost">X</button>
+</div>
+<form id="mform" style="margin-top:12px">
+<div class="row">
+<div class="col"><label>Código</label><input id="m_nro"></div>
+<div class="col"><label>Tipo</label><select id="m_tipo"></select></div>
+</div>
+<div class="row">
+<div class="col"><label>Factura</label><input id="m_fact"></div>
+<div class="col"><label>Cliente</label><input id="m_cli"></div>
+</div>
+<div class="row">
+<div class="col"><label>Razon</label><input id="m_raz"></div>
+<div class="col"><label>Fecha</label><input id="m_fecha" type="date"></div>
+</div>
+<div class="row">
+<div class="col"><label>Total</label><input id="m_total" type="number" step="0.01"></div>
+<div class="col"><label>Archivo</label><input id="m_file" type="file"></div>
+</div>
+<div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+<button class="btn" id="m_send" type="submit">ENVIAR</button>
+<button class="ghost" id="m_cancel" type="button">CANCELAR</button>
+</div>
+</form>
+</div>
+</div>
+</main>
+<script>
+(function(){
+const overlay=document.getElementById('overlay');
+document.getElementById('open').addEventListener('click',function(){fetch('notas_debito.json').then(r=>r.json()).then(j=>{const sel=document.getElementById('m_tipo');sel.innerHTML='';(j.tipos_comprobante_disponibles||[]).forEach(t=>{const o=document.createElement('option');o.value=t.codigo_tipo;o.textContent=t.codigo_tipo+' - '+t.descripcion_tipo;sel.appendChild(o)});overlay.style.display='flex'})});
+document.getElementById('close').addEventListener('click',function(){overlay.style.display='none'});
+document.getElementById('m_cancel').addEventListener('click',function(){overlay.style.display='none'});
+document.getElementById('mform').addEventListener('submit',function(e){e.preventDefault();const n={nro_comprobante:document.getElementById('m_nro').value,nro_de_factura_imputada:document.getElementById('m_fact').value,tipo_comprobante:{codigo_tipo:document.getElementById('m_tipo').value,descripcion_tipo:document.getElementById('m_tipo').selectedOptions[0]?.text.split(' - ')[1]},cod_cliente:document.getElementById('m_cli').value,razon_social:document.getElementById('m_raz').value,fecha_comprobante:document.getElementById('m_fecha').value,total_comprobante:parseFloat(document.getElementById('m_total').value)};fetch('notas_debito.json').then(r=>r.json()).then(j=>{j.encabezados_notas_debito.push(n);overlay.style.display='none';alert('Guardado (temporal)')})});
+})();
+</script>
+</body>
+</html>

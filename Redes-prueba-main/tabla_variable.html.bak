@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tabla con Variables</title>
+<link rel="stylesheet" href="ejercicio2.css">
+</head>
+<body>
+<header><h1>Tabla Variable</h1></header>
+<main>
+<div class="controls">
+<button class="btn" id="load">Cargar</button>
+<button class="ghost" id="clear">Vaciar</button>
+</div>
+<div class="table-wrap">
+<table id="tabla">
+<thead>
+<tr>
+<th>NroComprobante</th>
+<th>NroFacturaImputada</th>
+<th>CodigoTipo</th>
+<th>DescripcionTipo</th>
+<th>CodCliente</th>
+<th>RazonSocial</th>
+<th>FechaComprobante</th>
+<th>TotalComprobante</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+</main>
+<script>
+(function(){
+const tbody=document.querySelector('#tabla tbody');
+let datos=[];
+document.getElementById('load').addEventListener('click',function(){fetch('notas_debito.json').then(r=>r.json()).then(j=>{datos=j.encabezados_notas_debito||[];render()})});
+document.getElementById('clear').addEventListener('click',function(){datos=[];render()});
+function render(){tbody.innerHTML='';datos.forEach(n=>{const tr=document.createElement('tr');tr.innerHTML='<td>'+ (n.nro_comprobante||'') +'</td><td>'+ (n.nro_de_factura_imputada||'') +'</td><td>'+ (n.tipo_comprobante?.codigo_tipo||'') +'</td><td>'+ (n.tipo_comprobante?.descripcion_tipo||'') +'</td><td>'+ (n.cod_cliente||'') +'</td><td>'+ (n.razon_social||'') +'</td><td>'+ (n.fecha_comprobante||'') +'</td><td>'+ (n.total_comprobante||'') +'</td>';tbody.appendChild(tr)})}
+})();
+</script>
+</body>
+</html>
